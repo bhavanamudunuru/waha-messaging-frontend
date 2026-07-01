@@ -1,0 +1,9 @@
+{
+  "short_name": "Vaha Messenger",
+  "name": "Vaha Messenger - WhatsApp Messaging Service",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0B6E4F",
+  "background_color": "#FAF7F0"
+}

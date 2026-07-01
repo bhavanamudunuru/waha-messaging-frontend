@@ -1,0 +1,113 @@
+:root {
+  /* ── Color tokens ───────────────────────────────────────── */
+  --color-bg: #FAF7F0;
+  --color-bg-elevated: #FFFFFF;
+  --color-panel: #FFFFFF;
+
+  --color-ink: #1A2421;
+  --color-ink-soft: #4A5751;
+  --color-ink-faint: #8B968F;
+
+  --color-forest: #0B6E4F;
+  --color-forest-deep: #064A35;
+  --color-forest-soft: #E3F2EB;
+
+  --color-coral: #FF6B5C;
+  --color-coral-deep: #E2473A;
+  --color-coral-soft: #FFE9E5;
+
+  --color-amber: #F4A300;
+  --color-amber-soft: #FFF3DC;
+
+  --color-border: #E8E1D4;
+  --color-border-strong: #D8CFBC;
+
+  --color-chat-bg: #E7DFD0;
+  --color-bubble-out: #D9FDD3;
+  --color-bubble-shadow: rgba(11, 110, 79, 0.08);
+
+  /* ── Typography ─────────────────────────────────────────── */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* ── Shape ──────────────────────────────────────────────── */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  /* ── Shadows ────────────────────────────────────────────── */
+  --shadow-sm: 0 1px 2px rgba(26, 36, 33, 0.06);
+  --shadow-md: 0 8px 24px rgba(26, 36, 33, 0.08);
+  --shadow-lg: 0 20px 48px rgba(26, 36, 33, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 8% 12%, rgba(11, 110, 79, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 92% 88%, rgba(255, 107, 92, 0.06) 0%, transparent 45%);
+  min-height: 100vh;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: var(--font-body);
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--color-forest);
+  color: white;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: var(--radius-pill);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-faint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-forest);
+  outline-offset: 2px;
+}
