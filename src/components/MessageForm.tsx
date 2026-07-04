@@ -1,8 +1,9 @@
 import { useState, FormEvent } from 'react'
 import { Send, User, Users, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
-import { sendIndividualMessage, sendGroupMessage } from '../services/api'
-
-type Mode = 'individual' | 'group'
+import { sendIndividualMessage, sendGroupMessage, sendScheduledMessage } from '../services/api'
+import { Mode } from '../types'
+import { labelStyle, inputStyle, hintStyle } from './MessageForm.styles'
+import ScheduleFields from './ScheduleFields'
 
 interface Props {
   mode: Mode
@@ -15,6 +16,9 @@ export default function MessageForm({ mode, onMessageChange, onReceiverChange, o
   const [phoneNumber, setPhoneNumber] = useState('')
   const [countryCode, setCountryCode] = useState('91')
   const [groupId, setGroupId] = useState('')
+  const [scheduleReceiverType, setScheduleReceiverType] = useState<'individual' | 'group'>('individual')
+  const [scheduleReceiverId, setScheduleReceiverId] = useState('')
+  const [scheduledTime, setScheduledTime] = useState('')
   const [message, setMessage] = useState('')
   const [sending, setSending] = useState(false)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -50,13 +54,34 @@ export default function MessageForm({ mode, onMessageChange, onReceiverChange, o
       setFeedback({ type: 'error', text: 'Enter a WhatsApp group ID.' })
       return
     }
+    if (mode === 'schedule' && !scheduleReceiverId.trim()) {
+      setFeedback({ type: 'error', text: 'Enter a recipient.' })
+      return
+    }
+    if (mode === 'schedule' && !scheduledTime) {
+      setFeedback({ type: 'error', text: 'Pick a date & time to schedule.' })
+      return
+    }
 
     setSending(true)
     try {
       if (mode === 'individual') {
         await sendIndividualMessage({ phone_number: phoneNumber, message, country_code: countryCode })
-      } else {
+      } else if (mode === 'group') {
         await sendGroupMessage({ group_id: groupId, message })
+      } else {
+        const result = await sendScheduledMessage({
+          receiver_type: scheduleReceiverType,
+          receiver_id: scheduleReceiverId,
+          message,
+          scheduled_time: scheduledTime,
+          country_code: scheduleReceiverType === 'individual' ? countryCode : undefined,
+        })
+        setFeedback({ type: 'success', text: `Message scheduled! Will be sent in ${result.delay_seconds} seconds.` })
+        handleMessageInput('')
+        onSent()
+        setSending(false)
+        return
       }
       setFeedback({ type: 'success', text: 'Message sent successfully.' })
       handleMessageInput('')
@@ -70,7 +95,19 @@ export default function MessageForm({ mode, onMessageChange, onReceiverChange, o
 
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-      {mode === 'individual' ? (
+      {mode === 'schedule' ? (
+        <ScheduleFields
+          scheduleReceiverType={scheduleReceiverType}
+          setScheduleReceiverType={setScheduleReceiverType}
+          scheduleReceiverId={scheduleReceiverId}
+          setScheduleReceiverId={setScheduleReceiverId}
+          countryCode={countryCode}
+          setCountryCode={setCountryCode}
+          scheduledTime={scheduledTime}
+          setScheduledTime={setScheduledTime}
+          onReceiverChange={onReceiverChange}
+        />
+      ) : mode === 'individual' ? (
         <div>
           <label style={labelStyle}>
             <User size={14} /> Phone number
@@ -167,44 +204,14 @@ export default function MessageForm({ mode, onMessageChange, onReceiverChange, o
       >
         {sending ? (
           <>
-            <Loader2 size={17} className="spin" /> Sending...
+            <Loader2 size={17} className="spin" /> {mode === 'schedule' ? 'Scheduling...' : 'Sending...'}
           </>
         ) : (
           <>
-            <Send size={16} /> Send message
+            <Send size={16} /> {mode === 'schedule' ? 'Schedule message' : 'Send message'}
           </>
         )}
       </button>
     </form>
   )
-}
-
-const labelStyle: React.CSSProperties = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: 6,
-  fontSize: 12.5,
-  fontWeight: 600,
-  color: 'var(--color-ink-soft)',
-  marginBottom: 7,
-  textTransform: 'uppercase',
-  letterSpacing: '0.04em',
-}
-
-const inputStyle: React.CSSProperties = {
-  width: '100%',
-  padding: '11px 14px',
-  borderRadius: 'var(--radius-sm)',
-  border: '1.5px solid var(--color-border)',
-  background: 'var(--color-bg-elevated)',
-  fontSize: 14,
-  color: 'var(--color-ink)',
-  outline: 'none',
-}
-
-const hintStyle: React.CSSProperties = {
-  fontSize: 11.5,
-  color: 'var(--color-ink-faint)',
-  marginTop: 6,
-  fontFamily: 'var(--font-mono)',
 }
