@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { ScrollText, RefreshCw, Trash2, User, Users, CheckCircle2, XCircle } from 'lucide-react'
-import { fetchLogs, clearLogs, LogEntry } from '../services/api'
+import { fetchLogs, clearLogs } from '../services/api'
+import { LogEntry } from '../types'
 
 export default function LogsPanel({ refreshSignal }: { refreshSignal: number }) {
   const [logs, setLogs] = useState<LogEntry[]>([])

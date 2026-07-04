@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { SendIndividualPayload, SendGroupPayload, SendScheduledPayload, LogEntry, SessionStatus } from '../types';
 
 const BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
 
@@ -6,31 +7,6 @@ const api = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
 });
-
-export interface SendIndividualPayload {
-  phone_number: string;
-  message: string;
-  country_code?: string;
-}
-
-export interface SendGroupPayload {
-  group_id: string;
-  message: string;
-}
-
-export interface LogEntry {
-  timestamp: string;
-  receiver_type: 'individual' | 'group';
-  receiver_id: string;
-  message: string;
-  status: 'success' | 'failed';
-  error?: string | null;
-}
-
-export interface SessionStatus {
-  connected: boolean;
-  status: string;
-}
 
 function extractErrorMessage(err: unknown): string {
   if (axios.isAxiosError(err)) {
@@ -53,6 +29,15 @@ export async function sendIndividualMessage(payload: SendIndividualPayload) {
 export async function sendGroupMessage(payload: SendGroupPayload) {
   try {
     const res = await api.post('/api/send/group', payload);
+    return res.data;
+  } catch (err) {
+    throw new Error(extractErrorMessage(err));
+  }
+}
+
+export async function sendScheduledMessage(payload: SendScheduledPayload) {
+  try {
+    const res = await api.post('/api/send/scheduled', payload);
     return res.data;
   } catch (err) {
     throw new Error(extractErrorMessage(err));
